@@ -1,0 +1,118 @@
+{
+ "schema": "stegverse.workflow-surface-registry/v1",
+ "goal_id": "G17-WORKFLOW-SURFACE-MINIMIZATION",
+ "repository": "StegVerse-Labs/Epsteinality",
+ "policy_issue": "StegVerse-Labs/.github#167, #168; StegVerse-org/.github#166",
+ "preferred_repository_workflow_count_max": 2,
+ "exception_repository_workflow_count_max": 3,
+ "credential_authority": "the SKAP Vault inside KV is the only PII and credential store for every user, including the StegVerse ecosystem's own; no secret or token is referenced, introduced or moved by this fold",
+ "invariants": [
+  "Every workflow file is registered in surfaces[]; an unregistered or changed one fails closed (tests/test_workflow_surface_registry.py).",
+  "A new check is a group in tools/tasks/task_catalog.json, never a new workflow file.",
+  "The stable dispatcher carries no workflow_dispatch, schedule, repository_dispatch, issues or workflow_run trigger; a kept surface is pinned by sha256 and unchanged by the fold."
+ ],
+ "unregistered_workflow_outcome": {
+  "disposition": "FAIL_CLOSED",
+  "failure_code": "UNREGISTERED_WORKFLOW_SURFACE",
+  "failed_predicate": "EVERY_WORKFLOW_FILE_IS_REGISTERED",
+  "required_evidence_or_repair": "register the file in control/workflow-surface-registry.json surfaces[] or fold it into tools/tasks/task_catalog.json",
+  "retry_entrypoint": "tests/test_workflow_surface_registry.py",
+  "owning_existing_goal": "G17-WORKFLOW-SURFACE-MINIMIZATION (StegVerse-Labs/.github#167/#168); StegVerse-org/.github#166",
+  "next_attempt": "the next pull request touching .github/workflows/"
+ },
+ "surfaces": [
+  {
+   "path": ".github/workflows/validation-dispatcher.yml",
+   "classification": "KEEP_STABLE_DISPATCHER",
+   "triggers": [
+    "pull_request",
+    "push"
+   ],
+   "permissions": {
+    "contents": "read"
+   }
+  },
+  {
+   "path": ".github/workflows/erl-active-research.yml",
+   "classification": "KEEP_EXISTING_SURFACE_UNCHANGED",
+   "triggers": [
+    "schedule",
+    "workflow_dispatch"
+   ],
+   "permissions": {
+    "contents": "write"
+   },
+   "reason": "KEEP_EXISTING_SURFACE_UNCHANGED (destination-owned writer): ERL Active Research Acquisition acquires, sorts and commits research/ state with contents: write on its existing 6-hourly schedule (green through 2026-10-25). A run block in the read-only dispatcher cannot carry that write; its schedule is existing, not added, and is not changed.",
+   "verbatim_sha256": "39e3475e4f5807fb5364e897c21835843d54d41743e8cbac10ec6ab01d428e69"
+  }
+ ],
+ "folded": [
+  {
+   "workflow": ".github/workflows/archive-and-monitor.yml",
+   "name": "archive-and-monitor",
+   "triggers_before": [
+    "workflow_dispatch",
+    "schedule"
+   ],
+   "classification": "ELIMINATE",
+   "status": "DONE",
+   "reason": "Its triggers are workflow_dispatch and a schedule (GitHub state: unknown). Its only job calls the reusable workflow StegVerse/StegVerse-Core/.github/workflows/bio-archive-and-monitor.yml@main, and that repository does not resolve (HTTP 404), so every recorded run failed (latest: failure 2026-10-23). This lane carries no dispatch and enables no schedule. Kept verbatim as a record.",
+   "verbatim_record": "tools/tasks/folded/archive-and-monitor.yml",
+   "verbatim_sha256": "b2d5622afe892f4ad3d1939dcafa7f9c51a1eca27767c7b4dc8fd29429f5ff42"
+  },
+  {
+   "workflow": ".github/workflows/cooccurrence.yml",
+   "name": "cooccurrence-scan",
+   "triggers_before": [
+    "workflow_dispatch",
+    "schedule"
+   ],
+   "classification": "ELIMINATE",
+   "status": "DONE",
+   "reason": "Its triggers are workflow_dispatch and a schedule (GitHub state: unknown). Its only job calls the reusable workflow StegVerse/StegVerse-Core/.github/workflows/bio-cooccurrence.yml@main, and that repository does not resolve (HTTP 404), so every recorded run failed (latest: failure 2026-02-10). This lane carries no dispatch and enables no schedule. Kept verbatim as a record.",
+   "verbatim_record": "tools/tasks/folded/cooccurrence.yml",
+   "verbatim_sha256": "ee7f1626680e0811934804a0ec4e3316d3586ebb2a2e8bf20ff0b97dedce4aba"
+  },
+  {
+   "workflow": ".github/workflows/weekly-ingest.yml",
+   "name": "weekly-ingest",
+   "triggers_before": [
+    "workflow_dispatch",
+    "schedule"
+   ],
+   "classification": "ELIMINATE",
+   "status": "DONE",
+   "reason": "Its triggers are workflow_dispatch and a schedule (GitHub state: unknown). Its only job calls the reusable workflow StegVerse/StegVerse-Core/.github/workflows/bio-weekly-ingest.yml@main, and that repository does not resolve (HTTP 404), so every recorded run failed (latest: failure 2026-02-09). This lane carries no dispatch and enables no schedule. Kept verbatim as a record.",
+   "verbatim_record": "tools/tasks/folded/weekly-ingest.yml",
+   "verbatim_sha256": "788a710650611a6114891ad287c27ec5484a40749f8ccb9bcefc81f136527fbd"
+  },
+  {
+   "workflow": ".github/workflows/forward-to-bridge.yml",
+   "name": "Forward PR to StegVerse AI Bridge",
+   "triggers_before": [
+    "pull_request"
+   ],
+   "classification": "ELIMINATE",
+   "status": "DONE",
+   "reason": "Documented repair (StegVerse-Labs/StegVerse-SCW docs/SCW_AI_BRIDGE_DISPATCH_CREDENTIAL_BOUNDARY_MIRROR_HANDOFF.md @8a5c3136): on pull requests the forwarder materializes the organization secret GH_STEGVERSE_AI_TOKEN in a hosted runner, authenticates gh with it and dispatches cross-repository to StegVerse/hybrid-collab-bridge; consumer secret materialization is prohibited, the dispatch is retired and the replacement state is TVC_ADMITTED_TRANSPORT_REQUIRED (authority_effect NONE). It has no recorded run here. This lane carries no secret and no dispatch. Kept verbatim as a record.",
+   "verbatim_record": "tools/tasks/folded/forward-to-bridge.yml",
+   "verbatim_sha256": "9a4650b69cd6642d7f7669ee6cd6ec5fb53afe8ce7269d8385825b540ce96678"
+  },
+  {
+   "workflow": ".github/workflows/test-readiness.yml",
+   "name": "Test Readiness",
+   "triggers_before": [
+    "push",
+    "pull_request",
+    "workflow_dispatch"
+   ],
+   "classification": "CONSOLIDATE_INTO_STABLE_DISPATCHER",
+   "status": "DONE",
+   "catalog_groups": [
+    "test-readiness.repo-smoke"
+   ],
+   "verbatim_record": "tools/tasks/folded/test-readiness.yml",
+   "verbatim_sha256": "8508ba02eab5538440c83e9d43a26fd5a9a4c66185cdc0d4b73f8fcb49225f17"
+  }
+ ]
+}

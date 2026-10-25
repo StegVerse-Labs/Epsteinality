@@ -1,0 +1,77 @@
+{
+ "schema": "stegverse.task-catalog/v1",
+ "repository": "StegVerse-Labs/Epsteinality",
+ "goal_id": "G17-WORKFLOW-SURFACE-MINIMIZATION",
+ "authority": "Rigel 2026-10-24 retroactive G17 enforcement (StegVerse-org/.github#166); pattern StegVerse-Labs/StegDB#60 (eab2e773)",
+ "dispatcher": ".github/workflows/validation-dispatcher.yml",
+ "runner": "tools/tasks/run_catalog.py",
+ "runner_source": "StegVerse-Labs/StegDB tools/tasks/run_catalog.py @ eab2e773271f3e63466a710f1b4555f677882848 (sha256 f741f30557888fd8e4852a52adfc65736a08898d49ade7519f6bcc2672921e9b), copied unmodified",
+ "rule": "Every check a folded workflow job ran is one group here; its step bodies are the original run blocks byte for byte, pinned by sha256, except the repairs listed. A new check is a new group (or a step in one), never a new workflow file.",
+ "path_filters": "Dropped: every group runs on every pull_request and push to main (a superset of the original path-filtered runs). workflow_dispatch/schedule triggers are not carried (no manual dispatch, no cron).",
+ "repairs": [
+  "test-readiness.repo-smoke used to run on every push, pull request and dispatch; it now runs on pull requests and pushes to main."
+ ],
+ "folded_from_commit": "2beae2d8e8f59386aee5a64e11e27c07cac64d74",
+ "groups": [
+  {
+   "id": "test-readiness.repo-smoke",
+   "source": {
+    "workflow": ".github/workflows/test-readiness.yml",
+    "workflow_name": "Test Readiness",
+    "job": "repo-smoke",
+    "job_name": null,
+    "commit": "2beae2d",
+    "triggers_before": [
+     "push",
+     "pull_request",
+     "workflow_dispatch"
+    ],
+    "permissions_before": {
+     "contents": "read"
+    }
+   },
+   "events": [
+    "pull_request",
+    "push"
+   ],
+   "env": {},
+   "steps": [
+    {
+     "name": "Baseline repository smoke test",
+     "run_file": "tools/tasks/steps/test-readiness.repo-smoke/01-baseline-repository-smoke-test.sh",
+     "run_sha256": "b9ca9ed2406c9532b40bd3c46ae13c4eb0924562a3232a0b9308a04329377ec1"
+    }
+   ],
+   "artifacts": [],
+   "runner": {
+    "fetch_depth": "1",
+    "persist_credentials": "true",
+    "timeout_minutes": 5,
+    "python_version": "3.11"
+   }
+  },
+  {
+   "id": "workflow-surface-registry.validate",
+   "catalog_addition": "G17 registry gate (no folded source workflow)",
+   "events": [
+    "pull_request",
+    "push"
+   ],
+   "env": {},
+   "steps": [
+    {
+     "name": "Workflow files equal the registered surfaces; catalog verifies ALLOW",
+     "run_file": "tools/tasks/steps/workflow-surface-registry.validate/01-registry.sh",
+     "run_sha256": "811824e88664923006be2eeb35632d710f5504145967f61632ad9e8fbdcb35ca"
+    }
+   ],
+   "artifacts": [],
+   "runner": {
+    "fetch_depth": "1",
+    "persist_credentials": "false",
+    "timeout_minutes": 10,
+    "python_version": "3.11"
+   }
+  }
+ ]
+}
